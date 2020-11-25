@@ -19,8 +19,7 @@ def home():
 
     marsData = db.items.find().sort({_id:-1}).limit(1)
 
-    print("Server received request for 'Home' page...")
-    return "Welcome to the temporary home page!"
+    return render_template('index.html', data=marsData)
 
 
 # 4. Define what to do when a user hits the /about route
