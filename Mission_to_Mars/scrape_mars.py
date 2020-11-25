@@ -43,7 +43,7 @@ text = ""
 newsHeadings = soup.find_all('li', class_='slide')
 
 for heading in newsHeadings:
-    print(heading)
+    #print(heading)
     title = heading.find("div", { "class" : "content_title" }).getText()
     text = heading.find("div", { "class" : "article_teaser_body" }).getText()
     break
@@ -52,8 +52,8 @@ for heading in newsHeadings:
 # In[17]:
 
 
-print(title)
-print(text)
+#print(title)
+#print(text)
 
 
 # In[18]:
@@ -93,7 +93,7 @@ style = cssutils.parseStyle(article_style)
 featured_image_url = style['background-image']
 featured_image_url = featured_image_url.replace('url(', '').replace(')', '')
 
-print(featured_image_url)
+#print(featured_image_url)
 
 finalImageUrl = 'https://www.jpl.nasa.gov' + featured_image_url
 
@@ -169,7 +169,7 @@ for hemisphere in hemisphereList:
     for aItem in downloadLinks:
         #print(aItem)
         if aItem.contents[0] == "Sample":
-            print(aItem.contents[0])
+            #print(aItem.contents[0])
             hemisphereImageUrl = aItem['href']
             break
     
