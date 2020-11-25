@@ -15,176 +15,128 @@ import cssutils
 import pandas as pd
 
 
-# In[3]:
 
+def scrape():
 
-# Setup splinter
-executable_path = {'executable_path': ChromeDriverManager().install()}
-browser = Browser('chrome', **executable_path, headless=False)
+    # Setup splinter
+    executable_path = {'executable_path': ChromeDriverManager().install()}
+    browser = Browser('chrome', **executable_path, headless=False)
 
+    #Scraping the mars news website.
+    marsNewsUrl = 'https://mars.nasa.gov/news/'
+    browser.visit(marsNewsUrl)
 
-# In[12]:
+    html = browser.html
+    soup = BeautifulSoup(html, 'html.parser')
+    title = ""
+    text = ""
 
+    newsHeadings = soup.find_all('li', class_='slide')
 
-#Scraping the mars news website.
-marsNewsUrl = 'https://mars.nasa.gov/news/'
-browser.visit(marsNewsUrl)
+    for heading in newsHeadings:
+        #print(heading)
+        title = heading.find("div", { "class" : "content_title" }).getText()
+        text = heading.find("div", { "class" : "article_teaser_body" }).getText()
+        break
 
+    browser.quit()
 
-# In[16]:
+    #Scraping the mars image website.
+    # Setup splinter
+    executable_path = {'executable_path': ChromeDriverManager().install()}
+    browser = Browser('chrome', **executable_path, headless=False)
 
+    marsPicUrl = 'https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars'
+    browser.visit(marsPicUrl)
 
+    html = browser.html
+    soup = BeautifulSoup(html, 'html.parser')
+    title = ""
+    text = ""
 
-html = browser.html
-soup = BeautifulSoup(html, 'html.parser')
-title = ""
-text = ""
+    mainPicture = soup.find('div', class_='carousel_items')
 
-newsHeadings = soup.find_all('li', class_='slide')
+    article = mainPicture.find("article", { "class" : "carousel_item" })
 
-for heading in newsHeadings:
-    #print(heading)
-    title = heading.find("div", { "class" : "content_title" }).getText()
-    text = heading.find("div", { "class" : "article_teaser_body" }).getText()
-    break
+    article_style = article['style']
 
+    style = cssutils.parseStyle(article_style)
 
-# In[17]:
+    featured_image_url = style['background-image']
+    featured_image_url = featured_image_url.replace('url(', '').replace(')', '')
 
+    finalImageUrl = 'https://www.jpl.nasa.gov' + featured_image_url
 
-#print(title)
-#print(text)
+    browser.quit()
 
+    #Scraping the mars facts.
+    # Setup splinter
+    executable_path = {'executable_path': ChromeDriverManager().install()}
+    browser = Browser('chrome', **executable_path, headless=False)
 
-# In[18]:
+    marsPicUrl = 'https://space-facts.com/mars/'
+    browser.visit(marsPicUrl)
 
+    html = browser.html
+    soup = BeautifulSoup(html, 'html.parser')
 
-browser.quit()
+    tableFacts = pd.read_html(html)
 
+    df = tableFacts[0]
+    df.head()
 
-# In[2]:
+    browser.quit()
 
+    #Scraping the mars hemispheres.
+    # Setup splinter
+    executable_path = {'executable_path': ChromeDriverManager().install()}
+    browser = Browser('chrome', **executable_path, headless=False)
 
-#Scraping the mars image website.
-# Setup splinter
-executable_path = {'executable_path': ChromeDriverManager().install()}
-browser = Browser('chrome', **executable_path, headless=False)
+    marsHemisphereUrl = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+    browser.visit(marsHemisphereUrl)
 
-marsPicUrl = 'https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars'
-browser.visit(marsPicUrl)
+    html = browser.html
+    soup = BeautifulSoup(html, 'html.parser')
 
+    hemisphereList = soup.find_all('div', class_='item')
+    hemisphereDict = []
 
-# In[7]:
-
-
-html = browser.html
-soup = BeautifulSoup(html, 'html.parser')
-title = ""
-text = ""
-
-mainPicture = soup.find('div', class_='carousel_items')
-
-article = mainPicture.find("article", { "class" : "carousel_item" })
-
-article_style = article['style']
-
-style = cssutils.parseStyle(article_style)
-
-featured_image_url = style['background-image']
-featured_image_url = featured_image_url.replace('url(', '').replace(')', '')
-
-#print(featured_image_url)
-
-finalImageUrl = 'https://www.jpl.nasa.gov' + featured_image_url
-
-
-# In[8]:
-
-
-browser.quit()
-
-
-# In[4]:
-
-
-#Scraping the mars facts.
-# Setup splinter
-executable_path = {'executable_path': ChromeDriverManager().install()}
-browser = Browser('chrome', **executable_path, headless=False)
-
-marsPicUrl = 'https://space-facts.com/mars/'
-browser.visit(marsPicUrl)
-
-
-# In[5]:
-
-
-html = browser.html
-soup = BeautifulSoup(html, 'html.parser')
-
-tableFacts = pd.read_html(html)
-
-df = tableFacts[0]
-df.head()
-
-
-# In[6]:
-
-
-browser.quit()
-
-
-# In[32]:
-
-
-#Scraping the mars hemispheres.
-# Setup splinter
-executable_path = {'executable_path': ChromeDriverManager().install()}
-browser = Browser('chrome', **executable_path, headless=False)
-
-marsHemisphereUrl = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
-browser.visit(marsHemisphereUrl)
-
-
-# In[36]:
-
-
-html = browser.html
-soup = BeautifulSoup(html, 'html.parser')
-
-hemisphereList = soup.find_all('div', class_='item')
-hemisphereDict = []
-
-for hemisphere in hemisphereList:
+    for hemisphere in hemisphereList:
     
-    hemisphereText = hemisphere.find("h3").getText()
+        hemisphereText = hemisphere.find("h3").getText()
     
-    browser.links.find_by_partial_text('Hemisphere Enhanced').click()
+        browser.links.find_by_partial_text('Hemisphere Enhanced').click()
     
-    newHtml = browser.html
-    newSoup = BeautifulSoup(newHtml, 'html.parser')
+        newHtml = browser.html
+        newSoup = BeautifulSoup(newHtml, 'html.parser')
     
-    downloadLinks = newSoup.find_all('a')    
+        downloadLinks = newSoup.find_all('a')    
             
-    for aItem in downloadLinks:
-        #print(aItem)
-        if aItem.contents[0] == "Sample":
-            #print(aItem.contents[0])
-            hemisphereImageUrl = aItem['href']
-            break
+        for aItem in downloadLinks:
+            #print(aItem)
+            if aItem.contents[0] == "Sample":
+                #print(aItem.contents[0])
+                hemisphereImageUrl = aItem['href']
+                break
+        
+        hemisphereItem = {hemisphereText, hemisphereImageUrl}
     
-    #childA = downloadLi.findChildren("a" , recursive=False)
-    #hemisphereImageUrl = childA['href']
+        hemisphereDict.append(hemisphereItem)
     
-    hemisphereItem = {hemisphereText, hemisphereImageUrl}
-    
-    hemisphereDict.append(hemisphereItem)
-    
-    #print(hemisphereDict)
+    browser.quit()
+
+    finalDict = []
+
+    finalDict.append({title, text})
+    finalDict.append(finalImageUrl)
+    finalDict.append(df.to_html())
+    finalDict.append(hemisphereDict)
+
+    return finalDict
 
 
-# In[ ]:
 
 
-browser.quit()
+
+
 
