@@ -17,7 +17,8 @@ def home():
     db = client.marsDatabase
     collection = db.items
 
-    
+    marsData = db.items.find().sort({_id:-1}).limit(1)
+
     print("Server received request for 'Home' page...")
     return "Welcome to the temporary home page!"
 
